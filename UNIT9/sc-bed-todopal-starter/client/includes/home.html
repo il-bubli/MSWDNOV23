@@ -1,0 +1,31 @@
+<div class="card">
+  <div class="card-header">
+    Add a Todo
+  </div>
+  <div class="card-body">
+    <form id="todoForm">
+        <div class="row">
+            <div class="col-xs-4 col-md-10">
+                <input type="text" class="form-control form-control-lg" id="title" name="title" placeholder="Add your todo here" required>
+            </div>
+            <div class="col-xs-8 col-md-2">
+                <button type="submit" class="btn btn-primary btn-lg">Add</button>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-xs-4 col-md-10 gy-2">
+                <textarea class="form-control form-control-lg" id="notes" name="notes" style="color: darkgray;" placeholder="Add any notes here"></textarea>
+            </div>
+        </div>
+    </form>
+  </div>
+</div>
+<div class="card">
+  <div class="card-header">
+    Todos
+  </div>
+  <div class="card-body" id="todo-items">
+    <ul class="list-group" id="todo-items">
+    </ul>
+  </div>
+</div>

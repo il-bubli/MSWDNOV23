@@ -1,0 +1,15 @@
+.card {
+    margin: 20px auto 20px auto;
+}
+.completed {
+    text-decoration: line-through;
+}
+.alert {
+    margin-top: 20px;
+}
+#alertArea {
+    display: none;
+}
+.check-large {
+    scale: 2.7;
+}

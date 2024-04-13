@@ -1,0 +1,103 @@
+{
+	"info": {
+		"_postman_id": "b1922c05-0a9f-4956-8448-0064b567f39a",
+		"name": "User Management",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "2431004"
+	},
+	"item": [
+		{
+			"name": "Create User",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "formdata",
+					"formdata": [
+						{
+							"key": "email",
+							"value": "keith@icemalta.com",
+							"type": "text"
+						},
+						{
+							"key": "password",
+							"value": "MyPassword123",
+							"type": "text"
+						}
+					]
+				},
+				"url": {
+					"raw": "{{BASE_URI}}user",
+					"host": [
+						"{{BASE_URI}}user"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Modify A User",
+			"request": {
+				"method": "PATCH",
+				"header": [],
+				"body": {
+					"mode": "formdata",
+					"formdata": [
+						{
+							"key": "email",
+							"value": "keith@icemalta.com",
+							"type": "text"
+						},
+						{
+							"key": "password",
+							"value": "MyPassword123",
+							"type": "text"
+						}
+					]
+				},
+				"url": {
+					"raw": "{{BASE_URI}}user/1",
+					"host": [
+						"{{BASE_URI}}user"
+					],
+					"path": [
+						"1"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Delete A User",
+			"request": {
+				"method": "DELETE",
+				"header": [],
+				"body": {
+					"mode": "formdata",
+					"formdata": [
+						{
+							"key": "email",
+							"value": "keith@icemalta.com",
+							"type": "text"
+						},
+						{
+							"key": "password",
+							"value": "MyPassword123",
+							"type": "text"
+						}
+					]
+				},
+				"url": {
+					"raw": "{{BASE_URI}}user/1",
+					"host": [
+						"{{BASE_URI}}user"
+					],
+					"path": [
+						"1"
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}

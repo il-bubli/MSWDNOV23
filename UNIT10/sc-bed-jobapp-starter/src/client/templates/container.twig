@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en" data-bs-theme="{{ colour }}">
+    <head>
+        <title>JobApp</title>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <link rel="stylesheet" href="/lib/bootstrap/css/bootstrap.min.css">
+        <link rel="stylesheet" href="/lib/bootstrap-icons/bootstrap-icons.min.css">
+        <link rel="stylesheet" href="/css/main.css">
+    </head>
+    <body>
+        <div class="container">
+            {{ include('menu.twig')}}
+            {% if error %}
+            <div id='alertArea' class="alert alert-danger" role="alert">
+                {{ error }}
+            </div>
+            {% endif %}
+            {% if success %}
+            <div id='alertArea' class="alert-success" role="alert">
+                {{ success }}
+            </div>
+            {% endif %}
+            <div id="mainContent">
+                {% block content %}{% endblock %}
+            </div>
+        </div>
+        <script src="/lib/bootstrap/js/bootstrap.bundle.min.js"></script>
+    </body>
+</html>

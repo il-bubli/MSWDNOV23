@@ -1,0 +1,30 @@
+{% extends "container.twig" %}
+
+{% block content %}
+
+{% if applications is empty %}
+    <p>You have no applications yet! Check out our <a href="/">listings</a>.</p>
+{% else %}
+    <table class="table">
+        <thead>
+            <tr>
+                <td>Position</td>
+                <td>Company</td>
+                <td>Application Date</td>
+                <td>Location</td>
+            </tr>
+        </thead>
+        <tbody>
+            {% for application in applications %}
+                <tr>
+                    <td>{{ application.listing.jobTitle }}</td>
+                    <td>{{ application.listing.company }}</td>
+                    <td>{{ application.appDate }}</td>
+                    <td>{{ application.listing.location }}</td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+{% endif %}
+
+{% endblock %}

@@ -1,0 +1,48 @@
+<nav class="navbar navbar-expand-lg bg-body-tertiary">
+	<div class="container-fluid">
+		<a class="navbar-brand" href="/">JobApp</a>
+		<button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+			<span class="navbar-toggler-icon"></span>
+		</button>
+		<div class="collapse navbar-collapse" id="navbarSupportedContent">
+			<ul class="navbar-nav me-auto mb-2 mb-lg-0">
+				{% if loggedIn %}
+					<li class="nav-item">
+						<a class="nav-link {{ currentView == 'Listings' ? 'active' : ''}}" aria-current="page" href="/">Listings</a>
+					</li>
+					<li class="nav-item">
+						<a class="nav-link {{ currentView == 'Applications' ? 'active' : ''}}" aria-current="page" href="/applications">My Applications</a>
+					</li>
+				{% endif %}
+			</ul>
+			<div class="d-flex">
+				<ul class="navbar-nav me-auto mb-2 mb-lg-0">
+					<li class="nav-item">
+						<a class="nav-link  {{ currentView == 'Account' ? 'active' : ''}}" aria-current=" page" href=" /account">
+							<i class="bi-person-fill"></i>
+						</a>
+					</li>
+					<li class="nav-item dropdown">
+						<a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+							<span id="color-switch-area">
+								<i class="bi-moon-stars-fill"></i>
+							</span>
+						</a>
+						<ul class="dropdown-menu">
+							<li>
+								<a class="dropdown-item" href="/colour/dark">
+									<i class="bi-moon-stars-fill"></i>
+									Dark</a>
+							</li>
+							<li>
+								<a class="dropdown-item" href="/colour/light">
+									<i class="bi-sun-fill"></i>
+									Light</a>
+							</li>
+						</ul>
+					</li>
+				</ul>
+			</div>
+		</div>
+	</div>
+</nav>
