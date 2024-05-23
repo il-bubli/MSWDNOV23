@@ -109,6 +109,11 @@ class Product implements JsonSerializable
         return $products;
     }
 
+    public static function productSerialExists(array $products, $serial): bool {
+        $serialNumbers = array_column($products, 'serial');
+        return in_array($serial, $serialNumbers);
+    }
+
     public static function load(string $productSerial): Product|array
     {
         self::$db = DBConnect::getInstance()->getConnection();
@@ -117,7 +122,7 @@ class Product implements JsonSerializable
         $sth->bindValue('serial', $productSerial);
         $sth->execute();
         $product = $sth->fetchAll(PDO::FETCH_FUNC, fn(...$fields) => new Product(...$fields));
-        return count($product) > 0 ? $product[0] : [];
+        return $product[0];
     }
 
     public static function delete(Product $product): bool
@@ -128,7 +133,7 @@ class Product implements JsonSerializable
         $sth->execute();
         return $sth->rowCount() > 0;
     }
-    public function isProductValid(): bool
+      public function isProductValid(): bool
     {
         $sql = 'SELECT id FROM Product WHERE serial = :serial';
         $sth = $this->db->getConnection->prepare($sql);

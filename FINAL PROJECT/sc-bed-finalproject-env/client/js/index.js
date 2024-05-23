@@ -154,6 +154,7 @@ function bindHome() {
         },
         body: kahunaData,
       })
+
         .then(loadProducts)
         .catch((err) => showMessage(err, "danger"));
     });
@@ -202,7 +203,6 @@ function bindRegisterProduct() {
   document.getElementById("registerProductForm").addEventListener("submit", (event) => {
     event.preventDefault();
         serial = new FormData(document.getElementById("registerProductForm"));
-        console.log(serial['serial']);
         fetch(`${BASE_URI}registerProduct`, {
           mode: "cors",
           method: "POST",
@@ -212,8 +212,12 @@ function bindRegisterProduct() {
           }, 
           body: serial,
         })
-        .catch((err) => showMessage(err, "danger"));
-      });
+        .then((res) => res.json())
+        .then((res) => {
+          console.log(res.data);
+      })
+      .catch((err) => showMessage(err, "danger"));
+});
 }
 
 
@@ -261,5 +265,5 @@ function displayRegisteredProducts() {
 function showMessage(message, type) {
   const messageDiv = document.getElementById('registerProductMessage');
   messageDiv.textContent = message;
-  messageDiv.className = `alert alert-${type}`; // Assuming you use Bootstrap for styling
+  messageDiv.className = `alert alert-${type}`;
 }

@@ -131,7 +131,7 @@ $endpoints["logout"] = function (string $requestMethod, array $requestData): voi
             $userId = $requestData['user'];
             $token = new AccessToken($userId);
             $token = AccessToken::delete($token);
-            sendResponse('You are logged out', 200,);
+            sendResponse('You are logged out', 200, );
         } else {
             sendResponse(null, 403, 'Missing, invalid or expired token.');
         }
@@ -181,39 +181,47 @@ $endpoints["allRegisteredProducts"] = function (string $requestMethod, array $re
 
 $endpoints["registerProduct"] = function (string $requestMethod, array $requestData): void {
     if ($requestMethod === 'POST') {
-        
-        $productList = new registeredProduct();
-        $productList = RegisteredProduct::loadallRegisteredProducts();
+        $productList = RegisteredProduct::loadAll();
+        $regProductList = RegisteredProduct::loadallRegisteredProducts();
         if (checkToken($requestData)) {
             $productSerial = $requestData['serialNumber'];
-            if (in_array($productSerial, $productList)) {
-                sendResponse(1, 403, 'Product already registered.');
+            if (Product::productSerialExists($productList, $productSerial)) {                    
+                if (in_array($productSerial, $regProductList)) {
+                    sendResponse(null, 403, 'Product already registered.');
+                } else {
+                    $userId = $requestData['user'];
+                    $product = Product::load($productSerial);
+                    $registerProduct = new RegisteredProduct(id: $product->getId(), serial: $product->getserial(), name: $product->getname(), warrantyLength: $product->getwarrantyLength(), userId: $userId);
+                    $registerProduct = RegisteredProduct::saveRegisteredProduct($registerProduct);
+                    sendResponse($registerProduct, 201);
+                }
             } else {
-                $userId = $requestData['user'];
-                $product = Product::load($productSerial);
-                $registerProduct = new RegisteredProduct(id: $product->getId(), serial: $product->getserial(), name: $product->getname(), warrantyLength: $product->getwarrantyLength(), userId: $userId);
-                $registerProduct = RegisteredProduct::saveRegisteredProduct($registerProduct);
-                sendResponse($registerProduct, 201);
-            }
+                sendResponse(null, 403, "product doesn't exist.");} 
+            } else {
+            sendResponse(null, 403, 'Missing, invalid or expired token.');
+        } }else if ($requestMethod === 'GET') {
+        if (checkToken($requestData)) {
+            $userId = $requestData['user'];
+            $user = new RegisteredProduct(userId: $userId);
+            $registeredProducts = $user::loadRegisteredProducts($user);
+            sendResponse($registeredProducts);
         } else {
-        sendResponse(0, 403, 'Missing, invalid or expired token.');
+            sendResponse(null, 403, 'Missing, invalid or expired token.');
         }
-        
-    } else if ($requestMethod === 'GET') {
-            if (checkToken($requestData)) {
-                $userId = $requestData['user'];
-                $user = new RegisteredProduct(userId: $userId);
-                $registeredProducts = $user::loadRegisteredProducts($user);
-                sendResponse($registeredProducts);
-            } else {
-                sendResponse(null, 403, 'Missing, invalid or expired token.');
-            }
-    }    
-    else {
+    } else {
         // If the request method is not POST, return a "Method Not Allowed" response
         sendResponse(null, 405, 'Method not allowed');
     }
 };
+
+function searchForSerial($serial, $array) {
+   foreach ($array as $key => $val) {
+       if ($val['serial'] === $serial) {
+           return $key;
+       }
+   }
+   return null;
+}
 
 function cors()
 {
