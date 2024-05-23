@@ -216,7 +216,7 @@ function bindRegisterProduct() {
         .then((res) => {
           console.log(res.data);
       })
-      .catch((err) => showMessage(err, "danger"));
+      .catch((err) => console.log(err));
 });
 }
 
