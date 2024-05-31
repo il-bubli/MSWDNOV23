@@ -1,0 +1,102 @@
+{
+	"info": {
+		"_postman_id": "0fee9277-5e0c-43a9-b722-feb645b3746a",
+		"name": "Tickets",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "34023651"
+	},
+	"item": [
+		{
+			"name": "Create ticket",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "x-api-user",
+						"value": "{{user}}"
+					},
+					{
+						"key": "x-api-key",
+						"value": "{{token}}"
+					}
+				],
+				"body": {
+					"mode": "formdata",
+					"formdata": [
+						{
+							"key": "productId",
+							"value": "2",
+							"type": "text"
+						},
+						{
+							"key": "issueDescription",
+							"value": "Not working",
+							"type": "text"
+						},
+						{
+							"key": "messageContent",
+							"value": "sdfweqfd sdfwefew ewfwefe ewfewf",
+							"type": "text"
+						}
+					]
+				},
+				"url": {
+					"raw": "{{BASE_URI}}ticket",
+					"host": [
+						"{{BASE_URI}}ticket"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "View Ticket",
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "x-api-user",
+						"value": "{{user}}"
+					},
+					{
+						"key": "x-api-key",
+						"value": "{{token}}"
+					}
+				],
+				"url": {
+					"raw": "{{BASE_URI}}ticket/3",
+					"host": [
+						"{{BASE_URI}}ticket"
+					],
+					"path": [
+						"3"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "All Tickets",
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "x-api-user",
+						"value": "{{user}}"
+					},
+					{
+						"key": "x-api-key",
+						"value": "{{token}}"
+					}
+				],
+				"url": {
+					"raw": "{{BASE_URI}}allTickets",
+					"host": [
+						"{{BASE_URI}}allTickets"
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}

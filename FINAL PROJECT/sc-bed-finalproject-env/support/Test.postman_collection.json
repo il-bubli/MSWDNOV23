@@ -1,0 +1,24 @@
+{
+	"info": {
+		"_postman_id": "caf812bb-3bd4-44a0-acfb-152e0a273642",
+		"name": "Test",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "34023651"
+	},
+	"item": [
+		{
+			"name": "Test API",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{BASE_URI}}",
+					"host": [
+						"{{BASE_URI}}"
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}

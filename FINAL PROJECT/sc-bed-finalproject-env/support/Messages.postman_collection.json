@@ -1,0 +1,46 @@
+{
+	"info": {
+		"_postman_id": "60d1c13c-743c-41f9-be2e-3eb4ae3445ee",
+		"name": "Messages",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "34023651"
+	},
+	"item": [
+		{
+			"name": "Add Message",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "x-api-user",
+						"value": "{{user}}"
+					},
+					{
+						"key": "x-api-key",
+						"value": "{{token}}"
+					}
+				],
+				"body": {
+					"mode": "formdata",
+					"formdata": [
+						{
+							"key": "messageContent",
+							"value": "Testing from PostMan 2",
+							"type": "text"
+						}
+					]
+				},
+				"url": {
+					"raw": "{{BASE_URI}}message/4",
+					"host": [
+						"{{BASE_URI}}message"
+					],
+					"path": [
+						"4"
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}
