@@ -9,6 +9,8 @@ use \PDO;
 use \JsonSerializable;
 use com\icemalta\kahuna\model\DBConnect;
 
+//Modified from todopal in UNIT 9 with the help of chatGPT.
+
 class Product implements JsonSerializable
 {
     protected static $db;
@@ -111,15 +113,28 @@ class Product implements JsonSerializable
 
     public static function productSerialExists(array $products, $serial): bool {
         $serialNumbers = array_column($products, 'serial');
-        return in_array($serial, $serialNumbers);
+        return 
+        
+        in_array($serial, $serialNumbers);
     }
 
-    public static function load(string $productSerial): Product|array
+    public static function loadbyId(Product $product): Product|array
+    {
+        self::$db = DBConnect::getInstance()->getConnection();
+        $sql = 'SELECT serial, name, warrantyLength, id FROM Product WHERE id = :id';
+        $sth = self::$db->prepare($sql);
+        $sth->bindValue('id', $product->getId());
+        $sth->execute();
+        $product = $sth->fetchAll(PDO::FETCH_FUNC, fn(...$fields) => new Product(...$fields));
+        return $product[0];
+    }
+
+    public static function load(Product $product): Product|array
     {
         self::$db = DBConnect::getInstance()->getConnection();
         $sql = 'SELECT serial, name, warrantyLength, id FROM Product WHERE serial = :serial';
         $sth = self::$db->prepare($sql);
-        $sth->bindValue('serial', $productSerial);
+        $sth->bindValue('serial', $product->getSerial());
         $sth->execute();
         $product = $sth->fetchAll(PDO::FETCH_FUNC, fn(...$fields) => new Product(...$fields));
         return $product[0];
@@ -142,6 +157,8 @@ class Product implements JsonSerializable
         $result = $sth->fetch(PDO::FETCH_OBJ);
         return $result;
     }
+
+    
 }
 
 class RegisteredProduct extends Product implements JsonSerializable
@@ -158,10 +175,9 @@ class RegisteredProduct extends Product implements JsonSerializable
         $this->registeredId = $registeredId;
         $this->id = $id;
         $this->userId = $userId;
-        $this->purchaseDate = $dateToday->format('y-m-d');
+        $this->purchaseDate = $dateToday->format('Y-m-d');
         $warrantyEndDate = $dateToday->add(new DateInterval("P{$warrantyLength}Y"));
-        $this->warrantyEndDate = $warrantyEndDate->format('y-m-d');
-        $this->id = $id;
+        $this->warrantyEndDate = $warrantyEndDate->format('Y-m-d');
         self::$db = DBConnect::getInstance()->getConnection();
         }
 
@@ -265,7 +281,6 @@ class RegisteredProduct extends Product implements JsonSerializable
         $result = $sth->fetch(PDO::FETCH_OBJ);
         return $result;
     }
-
 
 }
 

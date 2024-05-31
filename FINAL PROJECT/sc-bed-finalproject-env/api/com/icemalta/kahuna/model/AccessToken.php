@@ -7,7 +7,7 @@ use \PDO;
 use \JsonSerializable;
 use com\icemalta\kahuna\model\DBConnect;
 
-//Access token code was modified from todopal in UNIT 9
+//Access token code was modified from todopal in UNIT 9.
 
 class AccessToken implements JsonSerializable
 {

@@ -3,6 +3,8 @@ namespace com\icemalta\kahuna\model;
 
 use \PDO;
 
+// This was set up during the starter.
+
 class DBConnect
 {
     private static $singleton = null;

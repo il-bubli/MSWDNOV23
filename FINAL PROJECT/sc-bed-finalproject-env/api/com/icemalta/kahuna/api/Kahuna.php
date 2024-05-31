@@ -5,12 +5,13 @@ require 'com/icemalta/kahuna/util/ApiUtil.php';
 require 'com/icemalta/kahuna/model/Product.php';
 require 'com/icemalta/kahuna/model/User.php';
 require 'com/icemalta/kahuna/model/AccessToken.php';
-
-
+require 'com/icemalta/kahuna/model/Ticket.php';
+require 'com/icemalta/kahuna/model/Message.php';
 
 use com\icemalta\kahuna\util\ApiUtil;
-use com\icemalta\kahuna\model\{Product, User, AccessToken, registeredProduct};
+use com\icemalta\kahuna\model\{Product, User, AccessToken, registeredProduct, Ticket, Message};
 
+//Modified from todopal in UNIT 9 with the help of chatGPT.
 
 cors();
 
@@ -72,7 +73,7 @@ if (empty($endPoint)) {
 }
 
 /* Extract Token */
-if (isset($_SERVER["HTTP_X_API_KEY"])) {
+if (isset($_SERVER["HTTP_X_API_USER"])) {
     $requestData["user"] = $_SERVER["HTTP_X_API_USER"];
 }
 if (isset($_SERVER["HTTP_X_API_KEY"])) {
@@ -93,9 +94,30 @@ $endpoints["user"] = function (string $requestMethod, array $requestData): void 
     if ($requestMethod === 'POST') {
         $email = $requestData['email'];
         $password = $requestData['password'];
-        $user = new User($email, $password);
+        if ($requestData['accessLevel'] === 'on')
+        {
+            $accessLevel = 'agent';
+        }
+        else
+        {
+            $accessLevel = 'user';
+        }
+        $user = new User($email, $password, $accessLevel);
         $user = User::save($user);
         sendResponse($user, 201);
+    } else if ($requestMethod === 'GET') {
+        if (checkToken($requestData)) {
+            $userId = $requestData['dataId'];
+            $user = new User(id: $userId);
+            $user = User::load($user);
+            if ($user) {
+                sendResponse($user, 200);
+            } else {
+                sendResponse(null, 404, 'User not found.');
+            }
+        } else {
+            sendResponse(null, 400, 'Missing, invalid or expired token.');
+        }
     } else if ($requestMethod === 'PATCH') {
         sendResponse(null, 501, 'Updating a user has not yet been implemented.');
     } else if ($requestMethod === 'DELETE') {
@@ -115,7 +137,7 @@ $endpoints["login"] = function (string $requestMethod, array $requestData): void
         if ($user) {
             $token = new AccessToken($user->getId());
             $token = AccessToken::save($token);
-            sendResponse(['user' => $user->getId(), 'token' => $token->getToken()]);
+            sendResponse(['user' => $user->getId(), 'token' => $token->getToken(), 'role' => $user->getAccessLevel()]);
         } else {
             sendResponse(null, 401, 'Login failed.');
         }
@@ -159,12 +181,17 @@ $endpoints["product"] = function (string $requestMethod, array $requestData): vo
         $products = Product::loadAll();
         sendResponse($products);
     } else if ($requestMethod === 'POST') {
+        $productList = Product::loadAll();
         $serial = $requestData['serial'];
-        $name = $requestData['name'];
-        $warrantyLength = $requestData['warrantyLength'];
-        $product = new Product($serial, $name, $warrantyLength);
-        $product = Product::save($product);
-        sendResponse($product, 201);
+        if (!Product::productSerialExists($productList, $serial)) {
+            $name = $requestData['name'];
+            $warrantyLength = $requestData['warrantyLength'];
+            $product = new Product($serial, $name, $warrantyLength);
+            $product = Product::save($product);
+            sendResponse($product, 201);
+        } else {
+            sendResponse(null, 404, 'Product already exists');
+        }
     } else {
         sendResponse(null, 404, 'Method not allowed');
     }
@@ -184,8 +211,8 @@ $endpoints["registerProduct"] = function (string $requestMethod, array $requestD
         $productList = RegisteredProduct::loadAll();
         $regProductList = RegisteredProduct::loadallRegisteredProducts();
         if (checkToken($requestData)) {
-            $productSerial = $requestData['serialNumber'];
-            if (Product::productSerialExists($productList, $productSerial)) {                    
+            $productSerial = $requestData['serial'];
+            if (Product::productSerialExists($productList, $productSerial)) {
                 if (in_array($productSerial, $regProductList)) {
                     sendResponse(null, 403, 'Product already registered.');
                 } else {
@@ -196,10 +223,12 @@ $endpoints["registerProduct"] = function (string $requestMethod, array $requestD
                     sendResponse($registerProduct, 201);
                 }
             } else {
-                sendResponse(null, 403, "product doesn't exist.");} 
-            } else {
+                sendResponse(null, 403, "product doesn't exist.");
+            }
+        } else {
             sendResponse(null, 403, 'Missing, invalid or expired token.');
-        } }else if ($requestMethod === 'GET') {
+        }
+    } else if ($requestMethod === 'GET') {
         if (checkToken($requestData)) {
             $userId = $requestData['user'];
             $user = new RegisteredProduct(userId: $userId);
@@ -214,13 +243,159 @@ $endpoints["registerProduct"] = function (string $requestMethod, array $requestD
     }
 };
 
-function searchForSerial($serial, $array) {
-   foreach ($array as $key => $val) {
-       if ($val['serial'] === $serial) {
-           return $key;
-       }
-   }
-   return null;
+$endpoints["ticket"] = function (string $requestMethod, array $requestData): void {
+    if ($requestMethod === 'POST') {
+        if (checkToken($requestData)) {
+            // Extract data from the request payload
+            $userId = $requestData['user'];
+            $productId = $requestData['productId'];
+            $issueDescription = $requestData['issueDescription'];
+            $messageContent = $requestData['messageContent'];
+
+            // Create a new Ticket object
+            $ticket = new Ticket($userId, $productId, $issueDescription);
+
+            // Save the ticket
+            $savedTicket = Ticket::save($ticket);
+
+            //Create a new Message object
+            $message = new Message($ticket->getId(), $ticket->getUserId(), $messageContent, new DateTime());
+            //Save the message
+            $message = Message::saveMessage($message);
+
+            $message = Message::loadTicketMessages($ticket->getId());
+
+            // Send the saved ticket data in the response
+            sendResponse($message, 201);
+        } else {
+            sendResponse(null, 403, 'Missing, invalid, or expired token.');
+        }
+
+    } else if ($requestMethod === 'GET') {
+        if (checkToken($requestData)) {
+            // Extract data from the request
+            $userId = $requestData['user'];
+            $productId = $requestData['dataId'];
+
+            // Load tickets associated with the user ID and product ID
+            $ticket = Ticket::loadUserTicket($userId, $productId);
+
+            if ($ticket === null) {
+                // Ticket not found for the given user and product
+                sendResponse(null, 201, 'Ticket not found.');
+            } else {
+                // Ticket found, proceed to load ticket details
+                $messages = Message::loadTicketMessages($ticket->getId());
+                $product = new Product(id: $productId);
+                $product = Product::loadbyId($product);
+                $user = new User(id: $userId);
+                $user = User::load($user);
+
+                $ticketDetails = [
+                    'id' => $ticket->getId(),
+                    'productName' => $product->getName(),
+                    'serial' => $product->getSerial(),
+                    'email' => $user->getEmail(),
+                    'issueDescription' => $ticket->getIssueDescription(),
+                    'status' => $ticket->getStatus(),
+                    'submissionDate' => $ticket->getSubmissionDate(),
+                    'messages' => $messages
+                ];
+                // Send the loaded tickets data in the response
+                sendResponse($ticketDetails, 201);
+            }
+        } else {
+            sendResponse(null, 403, 'Missing, invalid, or expired token.');
+        }
+    } else {
+        sendResponse(null, 405, 'Method not allowed');
+    }
+};
+
+$endpoints["allTickets"] = function (string $requestMethod, array $requestData): void {
+    if ($requestMethod === 'GET') {
+        if (checkToken($requestData)) {
+            // Fetch all tickets
+            $tickets = Ticket::loadAll();
+            foreach ($tickets as $ticket) {
+                $messages = Message::loadTicketMessages($ticket->getId());
+                $product = new Product(id: $ticket->getProductId());
+                $product = Product::loadbyId($product);
+                $user = new User(id: $ticket->getUserId());
+                $user = User::load($user);
+
+                $ticketDetails[] = [
+                    'id' => $ticket->getId(),
+                    'productName' => $product->getName(),
+                    'serial' => $product->getSerial(),
+                    'email' => $user->getEmail(),
+                    'issueDescription' => $ticket->getIssueDescription(),
+                    'status' => $ticket->getStatus(),
+                    'submissionDate' => $ticket->getSubmissionDate(),
+                    'messages' => $messages
+                ];
+            }           
+
+                sendResponse($ticketDetails, 201);
+        } else {
+            sendResponse(null, 403, 'Missing, invalid, or expired token.');
+        }
+    } else {
+        sendResponse(null, 405, 'Method not allowed');
+    }
+};
+
+$endpoints["message"] = function (string $requestMethod, array $requestData): void {
+    if ($requestMethod === 'POST') {
+        if (checkToken($requestData)) {
+            $ticketId = $requestData['dataId'];
+            $messageContent = $requestData['messageContent'];
+    
+            // If userId is not provided, fetch it from the ticket
+                $ticket= new Ticket(id: $ticketId);
+                $ticket = Ticket::load($ticket);
+                $userId = $ticket->getUserId();
+    
+            // Create a new Message object
+            $message = new Message($ticketId, $userId, $messageContent, new DateTime());
+    
+            // Save the message
+            $savedMessage = Message::saveMessage($message);
+    
+            // Send the saved message data in the response
+            sendResponse($savedMessage, 201);
+    }else {
+    sendResponse(null, 403, 'Missing, invalid, or expired token.');
+}
+    } else if ($requestMethod === 'GET') {
+        if (checkToken($requestData)) {
+            // Extract data from the request
+            $userId = $requestData['user'];
+            $ticketId = $requestData['ticketId'];
+
+            // Load messages associated with the user ID and ticket ID
+            $messages = Message::loadTicketMessages($ticketId);
+
+            // Send the loaded messages data in the response
+            sendResponse($messages, 200);
+        } else {
+            sendResponse(null, 403, 'Missing, invalid, or expired token.');
+        }
+    } else {
+        sendResponse(null, 405, 'Method not allowed');
+    }
+};
+
+
+
+function searchForSerial($serial, $array)
+{
+    foreach ($array as $key => $val) {
+        if ($val['serial'] === $serial) {
+            return $key;
+        }
+    }
+    return null;
 }
 
 function cors()

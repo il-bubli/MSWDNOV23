@@ -1,8 +1,8 @@
-# PHP & MariaDB Development Enviroment Tester
+# Kahuna App
 
 ## Purpose
 
-This simple app will help setup a working enviroment for your final project. It will also check that PHP is working, and that a connection to the MariaDB database server can be established. 
+An app to help clients register products and send tickets and to help agents manage the products and reply to the clients. 
 
 ## Usage
 
@@ -26,9 +26,3 @@ PHP has been setup as usual. A MariaDB server has also been created. Details fol
 The services started include:
 - API Server on [http://localhost:8000](https://localhost:8000).
 - Client on [http://localhost:8001](https://localhost:8001).
-
-## Next Steps
-
-You can now start working on your final project.
-
-1. It is safe to delete the contents of the **client** folder. 
