@@ -26,3 +26,6 @@ PHP has been setup as usual. A MariaDB server has also been created. Details fol
 The services started include:
 - API Server on [http://localhost:8000](https://localhost:8000).
 - Client on [http://localhost:8001](https://localhost:8001).
+
+Uploaded on github:
+https://github.com/il-bubli/MSWDNOV23/tree/f63f8c9d41b2688df49e5f0b42f1116e310407ed/FINAL%20PROJECT/sc-bed-finalproject-env
